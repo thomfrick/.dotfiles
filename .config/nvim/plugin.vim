@@ -91,6 +91,8 @@ Plug 'w0rp/ale'
 "{{{
     " Set this. Airline will handle the rest.
     let g:airline#extensions#ale#enabled = 1
+    let g:ale_lint_on_text_changed = 'never'
+    let g:ale_lint_on_enter = 0
 "}}}
 
 
@@ -98,6 +100,7 @@ Plug 'w0rp/ale'
 Plug 'Shougo/deoplete.nvim', {'do': ':UpdateRemotePlugins'}
 Plug 'zchee/deoplete-jedi'
 let g:deoplete#enable_at_startup = 1
+Plug 'Shougo/deoplete-clangx'
 
 " latex
 Plug 'lervag/vimtex'
