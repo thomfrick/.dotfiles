@@ -98,3 +98,5 @@ vnoremap > >gv
 " NerdTree Toggle
 map <C-n> :NERDTreeToggle<CR>
 map <C-m> :TagbarToggle<CR>
+nnoremap <C-f> :Ag<CR>
+map <leader>f :Files<CR>

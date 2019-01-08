@@ -52,6 +52,9 @@ Plug 'scrooloose/nerdtree'
 " TagBar
 Plug 'majutsushi/tagbar'
 
+" EasyMotion
+Plug 'easymotion/vim-easymotion'
+
 " Brackets
 Plug 'Raimondi/delimitMate'
 
