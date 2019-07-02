@@ -65,7 +65,9 @@ ZSH_THEME="agnoster"
 plugins=(
   git
   zsh-autosuggestions
+  zsh-completions
 )
+
 ZSH_DISABLE_COMPFIX=true
 source $ZSH/oh-my-zsh.sh
 
