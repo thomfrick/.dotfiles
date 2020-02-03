@@ -11,7 +11,7 @@ if has('nvim') || has('termguicolors')
 endif
 
 " Setup Python
-let g:python3_host_prog='/Users/tfr/anaconda3/bin/python3'
+let g:python3_host_prog='python3'
 let g:python_host_prog='/usr/bin/python2'
 
 source ~/.config/nvim/plugin.vim
