@@ -1,0 +1,10 @@
+{
+    "languageserver": {
+        "swift": {
+              "command": "sourcekit-lsp",
+              "filetypes": ["swift"],
+              "trace.server": "verbose"
+            },
+      },
+    "python.formatting.provider": "black"
+}

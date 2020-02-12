@@ -24,7 +24,6 @@ Plug 'vim-airline/vim-airline-themes'
 "}}}
 
 " Theme
-"Plug 'romainl/Apprentice', { 'branch': 'fancylines-and-neovim' }
 Plug 'hzchirs/vim-material'
 ""{{{
 let g:material_style='palenight'
@@ -33,6 +32,8 @@ let g:material_style='palenight'
 " Git integration
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
+Plug 'jreybert/vimagit'
+
 " File Browser
 Plug 'scrooloose/nerdtree'
 "{{{
@@ -67,43 +68,11 @@ Plug 'sheerun/vim-polyglot'
 " SpellChecking
 Plug 'rhysd/vim-grammarous'
 
-" Linting
-"Plug 'neomake/neomake'
-"" {{{
-    "let g:neomake_open_list = 2
-    "" neomake is async => it doesn't block the editor
-    "" It's a syntastic alternative. Syntastic was slow for me on python files.
-    "" $ sudo pip2/pip3 install flake8 -U
-    "" $ sudo pip2/pip3 install vulture -U
-    "let g:neomake_python_enabled_makers = ['flake8', "python"]
-    "" let g:neomake_python_enabled_makers = ['flake8', 'pep8']
-    "" E501 is line length of 80 characters
-    "let g:neomake_python_flake8_maker = { 'args': ['--ignore=E115,E266,E501'], }
-    "let g:neomake_python_pep8_maker = { 'args': ['--max-line-length=120', '--ignore=E115,E266'], }
- 
-    "" run neomake on the current file on every write:
-    "autocmd! BufWritePost * Neomake
-"" }}}
 
-"" Formatting
-"Plug 'sbdchd/neoformat'
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
 
-Plug 'w0rp/ale'
-"{{{
-    " Set this. Airline will handle the rest.
-    let g:airline#extensions#ale#enabled = 1
-    let g:ale_lint_on_text_changed = 'never'
-    let g:ale_lint_on_enter = 0
-"}}}
-
-
-" Auto Completion
-Plug 'Shougo/deoplete.nvim', {'do': ':UpdateRemotePlugins'}
-Plug 'zchee/deoplete-jedi'
-let g:deoplete#enable_at_startup = 1
-"let g:deoplete#sources#jedi#show_docstring = 1
-
-Plug 'Shougo/deoplete-clangx'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 " latex
 Plug 'lervag/vimtex'
@@ -111,9 +80,6 @@ Plug 'lervag/vimtex'
 " fuzzy search
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
-"{{{
-    
-"}}}
 
 "use patched unicode symbols from nerd fonts, needs to load last!
 Plug 'ryanoasis/vim-devicons'
