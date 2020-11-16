@@ -1,6 +1,9 @@
 ;; -*- mode: emacs-lisp; lexical-binding: t -*-
 ;; This file is loaded by Spacemacs at startup.
 ;; It must be stored in your home directory.
+(when (memq window-system '(mac ns))
+  (add-to-list 'default-frame-alist '(ns-appearance . dark)) ; nil for dark text
+  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t)))
 
 (defun dotspacemacs/layers ()
   "Layer configuration:
@@ -49,9 +52,11 @@ This function should only modify configuration layer settings."
                       auto-completion-enable-snippets-in-popup t
                       auto-completion-enable-help-tooltip t
                       auto-completion-use-company-box t
+                      auto-completion-enable-snippets-in-popup t
                       auto-completion-enable-sort-by-usage nil)
      ;; better-defaults
      emacs-lisp
+     osx
      git
      helm
      lsp
@@ -59,28 +64,61 @@ This function should only modify configuration layer settings."
      multiple-cursors
      (org :variables
           org-enable-org-journal-support t
-          org-indent-m
+          org-journal-dir "~/Box/Notes/org-journal"
+          org-download-image-dir "~/Box/Notes/images"
+          org-journal-file-format "%Y-%m-%d"
+          org-journal-date-prefix "#+TITLE: "
+          org-journal-date-format "%A, %B %d %Y"
+          org-journal-time-prefix "* "
+          org-journal-time-format ""
+          org-indent-mode t
+          org-enable-reveal-js-support t
+          org-re-reveal-root "file:///Users/fri/node_modules/reveal.js"
+          org-re-reveal-hlevel 2
           )
+     deft
      latex
      (shell :variables
             shell-default-height 30
-            shell-default-position 'bottom)
+            shell-default-position 'bottom
+            shell-default-shell 'vterm)
      spell-checking
      syntax-checking
-     version-control
-     treemacs
+     (version-control :variables
+                      version-control-global-margin t
+                      version-control-diff-side 'left
+                      )
+     (treemacs :variables
+               treemacs-use-filewatch-mode t
+               treemacs-use-icons-dired t
+               treemacs-use-scope-type 'Frames
+               )
      (python :variables
              python-backend 'lsp
              python-lsp-server 'pyls
              python-tab-width 4
              python-fill-column 99
-             python-format 'lsp
-             python-sort-imports-on-save t
+             python-format nil
+             python-sort-imports-on-save nil
              python-format-on-save t
              )
+     ipython-notebook
      tmux
      org-roam
-     )
+     bibtex
+     pdf
+     yaml
+     php
+     react
+     (javascript :variables
+                 javascript-backend 'lsp
+                 js2-mode-show-strict-warnings nil
+                 javascript-fmt-tool 'prettier
+                 javascript-fmt-on-save t
+                 )
+     typescript
+     html
+     docker)
 
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -89,7 +127,9 @@ This function should only modify configuration layer settings."
    ;; To use a local version of a package, use the `:location' property:
    ;; '(your-package :location "~/path/to/your-package/")
    ;; Also include the dependencies as they will not be resolved automatically.
-   dotspacemacs-additional-packages '()
+   dotspacemacs-additional-packages '(exec-path-from-shell
+                                      org-noter
+                                      one-themes)
 
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -226,7 +266,7 @@ It should only modify the values of Spacemacs settings."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(doom-wilmersdorf
+   dotspacemacs-themes '(
                          doom-one
                          spacemacs-dark
                          spacemacs-light
@@ -239,15 +279,15 @@ It should only modify the values of Spacemacs settings."
    ;; refer to the DOCUMENTATION.org for more info on how to create your own
    ;; spaceline theme. Value can be a symbol or list with additional properties.
    ;; (default '(spacemacs :separator wave :separator-scale 1.5))
-   dotspacemacs-mode-line-theme '(all-the-icons :separator arrow :separator-scale 1.5)
+   dotspacemacs-mode-line-theme '(doom :separator arrow :separator-scale 1.5)
 
    ;; If non-nil the cursor color matches the state color in GUI Emacs.
    ;; (default t)
    dotspacemacs-colorize-cursor-according-to-state t
 
    ;; Default font or prioritized list of fonts.
-   dotspacemacs-default-font '("Source Code Pro"
-                               :size 14.0
+   dotspacemacs-default-font '("Cascadia Mono PL"
+                               :size 12.0
                                :weight normal
                                :width normal)
 
@@ -403,14 +443,14 @@ It should only modify the values of Spacemacs settings."
    ;; (default nil)
    dotspacemacs-line-numbers
    '(:relative nil
-     :visual nil
-     :disabled-for-modes dired-mode
-                         doc-view-mode
-                         markdown-mode
-                         org-mode
-                         pdf-view-mode
-                         text-mode
-     :size-limit-kb 1000)
+               :visual nil
+               :disabled-for-modes dired-mode
+               doc-view-mode
+               markdown-mode
+               org-mode
+               pdf-view-mode
+               text-mode
+               :size-limit-kb 1000)
 
    ;; Code folding method. Possible values are `evil' and `origami'.
    ;; (default 'evil)
@@ -494,7 +534,7 @@ It should only modify the values of Spacemacs settings."
    ;; Run `spacemacs/prettify-org-buffer' when
    ;; visiting README.org files of Spacemacs.
    ;; (default nil)
-   dotspacemacs-pretty-docs nil))
+   dotspacemacs-pretty-docs t))
 
 (defun dotspacemacs/user-env ()
   "Environment variables setup.
@@ -510,7 +550,7 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
-  (setenv "WORKON_HOME" "/home/tfrick/anaconda3/envs")
+  (setenv "WORKON_HOME" "~/anaconda3/envs")
   )
 
 (defun dotspacemacs/user-load ()
@@ -529,37 +569,125 @@ before packages are loaded."
   (setq org-startup-indented t
         org-ellipsis "  " ;; folding symbol
         org-pretty-entities t
+        org-pretty-entities-include-sub-superscripts nil
         org-hide-emphasis-markers t
         ;; show actually italicized text instead of /italicized text/
         org-agenda-block-separator ""
         org-fontify-whole-heading-line t
         org-fontify-done-headline t
         org-fontify-quote-and-verse-blocks t
+        org-image-actual-width 800
         )
-  (setq org-superstar-headline-bullets-list '(" " " " " " " " " " " " " " " "))
+  (setq deft-directory "~/Box/Notes/org-roam"
+        deft-extensions '("org")
+        deft-recursive t
+        )
+  ;; (let* ((variable-tuple
+  ;;         (cond
+  ;;               ((x-list-fonts "Source Sans Pro") '(:font "Source Sans Pro"))
+  ;;               ((x-list-fonts "Lucida Grande")   '(:font "Lucida Grande"))
+  ;;               ((x-list-fonts "Verdana")         '(:font "Verdana"))
+  ;;               ((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
+  ;;               (nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro."))))
+  ;;       (base-font-color     (face-foreground 'default nil 'default))
+  ;;       (headline           `(:inherit default :weight bold :foreground ,base-font-color)))
 
-  (let* ((variable-tuple (cond ((x-list-fonts "Source Sans Pro") '(:font "Source Sans Pro"))
-                              ((x-list-fonts "Lucida Grande")   '(:font "Lucida Grande"))
-                              ((x-list-fonts "Verdana")         '(:font "Verdana"))
-                              ((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
-                              (nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro."))))
-        (base-font-color     (face-foreground 'default nil 'default))
-        (headline           `(:inherit default :weight bold :foreground ,base-font-color)))
+  ;; (custom-theme-set-faces
+  ;;   'user
+  ;;   `(org-level-8 ((t (,@headline ,@variable-tuple))))
+  ;;   `(org-level-7 ((t (,@headline ,@variable-tuple))))
+  ;;   `(org-level-6 ((t (,@headline ,@variable-tuple))))
+  ;;   `(org-level-5 ((t (,@headline ,@variable-tuple))))
+  ;;   `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
+  ;;   `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.25))))
+  ;;   `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.5))))
+  ;;   `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.75))))
+  ;;   `(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))))
+  ;; (custom-theme-set-faces
+  ;;   'user
+  ;;   '(org-block ((t (:inherit fixed-pitch))))
+  ;;   '(org-code ((t (:inherit (shadow fixed-pitch)))))
+  ;;   '(org-document-info ((t (:foreground "dark orange"))))
+  ;;   '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+  ;;   '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
+  ;;   '(org-link ((t (:foreground "royal blue" :underline t))))
+  ;;   '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+  ;;   '(org-property-value ((t (:inherit fixed-pitch))) t)
+  ;;   '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+  ;;   '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
+  ;;   '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
+  ;;   '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
+  ;; (custom-theme-set-faces
+  ;;  'user
+  ;;  '(variable-pitch ((t (:family "Source Sans Pro" :height 140 :weight normal))))
+  ;;  '(fixed-pitch ((t ( :family "CaskaydiaCove Nerd Font Mono" :height 120)))))
 
-    (custom-theme-set-faces 'user
-                            `(org-level-8 ((t (,@headline ,@variable-tuple))))
-                            `(org-level-7 ((t (,@headline ,@variable-tuple))))
-                            `(org-level-6 ((t (,@headline ,@variable-tuple))))
-                            `(org-level-5 ((t (,@headline ,@variable-tuple :height 1.1))))
-                            `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.25))))
-                            `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.5))))
-                            `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.8))))
-                            `(org-level-1 ((t (,@headline ,@variable-tuple :height 2.0))))
-                            `(org-document-title ((t (,@headline ,@variable-tuple :height 3.0 :underline nil))))))
- )
+  ;; (add-hook 'org-mode-hook 'variable-pitch-mode)
+  (add-hook 'org-mode-hook 'visual-line-mode)
 
-;; Do not write anything past this comment. This is where Emacs will
-;; auto-generate custom variable definitions.
+  (setq org-ref-default-bibliography '("~/Box/Notes/ZoteroLibrary.bib")
+        org-ref-pdf-directory "~/Zotero/storage"
+        org-ref-bibliography-notes "~/Box/Notes/org-roam"
+        org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-helm-bibtex
+        org-ref-note-title-format "* TODO %y - %t\n :PROPERTIES:\n  :Custom_ID: %k\n  :NOTER_DOCUMENT: %F\n :ROAM_KEY: cite:%k\n  :AUTHOR: %9a\n  :JOURNAL: %j\n  :YEAR: %y\n  :VOLUME: %v\n  :PAGES: %p\n  :DOI: %D\n  :URL: %U\n :END:\n\n"
+        org-ref-notes-directory "~/Box/Notes/org-roam"
+        org-ref-notes-function 'orb-edit-notes
+        bibtex-completion-bibliography "~/Box/Notes/ZoteroLibrary.bib"
+        bibtex-completion-pdf-field "file"
+        bibtex-completion-notes-template-multiple-files
+        (concat
+         "#+TITLE: ${title}\n"
+         "#+ROAM_KEY: cite:${=key=}\n"
+         "* TODO Notes\n"
+         ":PROPERTIES:\n"
+         ":Custom_ID: ${=key=}\n"
+         ":NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n"
+         ":AUTHOR: ${author-abbrev}\n"
+         ":JOURNAL: ${journaltitle}\n"
+         ":DATE: ${date}\n"
+         ":YEAR: ${year}\n"
+         ":DOI: ${doi}\n"
+         ":URL: ${url}\n"
+         ":END:\n\n"
+         )
+        )
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
+  (defun my/org-ref-open-pdf-at-point ()
+    "Open the pdf for bibtex key under point if it exists."
+    (interactive)
+    (let* ((results (org-ref-get-bibtex-key-and-file))
+           (key (car results))
+           (pdf-file (car (bibtex-completion-find-pdf key))))
+      (if (file-exists-p pdf-file)
+          (find-file-other-window pdf-file)
+        (message "No PDF found for %s" key))))
+
+  (setq org-ref-open-pdf-function 'my/org-ref-open-pdf-at-point)
+  (setq bibtex-completion-pdf-open-function 'my/org-ref-open-pdf-at-point)
+  (setq
+   ;; The WM can handle splits
+   org-noter-notes-window-location 'other-frame
+   ;; Please stop opening frames
+   org-noter-always-create-frame nil
+   ;; I want to see the whole file
+   org-noter-hide-other nil
+   ;; Everything is relative to the main notes file
+   org-noter-notes-search-path '("~/Box/Notes/org-roam"))
+
+  (when (memq window-system '(mac ns))
+    (setenv "SHELL" "/bin/zsh")
+    (exec-path-from-shell-initialize)
+    (exec-path-from-shell-copy-envs
+     '("PATH")))
+
+  (defun my/clean-annotations1()
+    (interactive)
+    (flush-lines ":PROPERTIES:[\0-\377[:nonascii:]]*?:END:\n")
+    (flush-lines "\\*+\s[Highlight|Contents].*")
+    ;; (replace-regexp "^\\([a-z]\\)" "- \\1")
+   )
+  )
+
 (defun dotspacemacs/emacs-custom-settings ()
   "Emacs custom settings.
 This is an auto-generated function, do not modify its content directly, use
@@ -570,20 +698,29 @@ This function is called at the very end of Spacemacs initialization."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(evil-want-Y-yank-to-eol nil)
+ '(hl-todo-keyword-faces
+   '(("TODO" . "#dc752f")
+     ("NEXT" . "#dc752f")
+     ("THEM" . "#2d9574")
+     ("PROG" . "#4f97d7")
+     ("OKAY" . "#4f97d7")
+     ("DONT" . "#f2241f")
+     ("FAIL" . "#f2241f")
+     ("DONE" . "#86dc2f")
+     ("NOTE" . "#b1951d")
+     ("KLUDGE" . "#b1951d")
+     ("HACK" . "#b1951d")
+     ("TEMP" . "#b1951d")
+     ("FIXME" . "#dc752f")
+     ("XXX+" . "#dc752f")
+     ("\\?\\?\\?+" . "#dc752f")))
  '(package-selected-packages
-   '(yaml-mode web-beautify utop tuareg caml tide typescript-mode seeing-is-believing rvm ruby-tools ruby-test-mode ruby-refactor ruby-hash-syntax rubocopfmt rubocop rspec-mode robe rbenv rake prettier-js ocp-indent ob-elixir nodejs-repl mvn minitest meghanada maven-test-mode lsp-java livid-mode skewer-mode simple-httpd json-navigator hierarchy json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc groovy-mode groovy-imports pcache gradle-mode flycheck-ocaml merlin flycheck-credo emojify emoji-cheat-sheet-plus dune company-emoji chruby bundler inf-ruby alchemist elixir-mode org-journal yasnippet-snippets yapfify xterm-color ws-butler writeroom-mode winum which-key vterm volatile-highlights vi-tilde-fringe uuidgen use-package treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil toc-org terminal-here symon symbol-overlay string-inflection spaceline-all-the-icons smeargle shell-pop restart-emacs rainbow-delimiters pytest pyenv-mode py-isort posframe popwin pippel pipenv pip-requirements pcre2el password-generator paradox overseer orgit org-superstar org-projectile org-present org-pomodoro org-mime org-download org-cliplink org-brain open-junk-file nameless multi-term move-text mmm-mode markdown-toc magit-svn magit-section magit-gitflow macrostep lsp-ui lsp-python-ms lorem-ipsum live-py-mode link-hint indent-guide importmagic hybrid-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-org-rifle helm-org helm-mode-manager helm-make helm-lsp helm-ls-git helm-gitignore helm-git-grep helm-flx helm-descbinds helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitignore-templates gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ gh-md fuzzy font-lock+ flyspell-correct-helm flycheck-pos-tip flycheck-package flycheck-elsa flx-ido fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help emr elisp-slime-nav editorconfig dumb-jump dotenv-mode doom-themes diminish devdocs define-word dap-mode cython-mode company-reftex company-quickhelp company-box company-auctex company-anaconda column-enforce-mode clean-aindent-mode centered-cursor-mode browse-at-remote blacken auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile aggressive-indent ace-link ace-jump-helm-line ac-ispell)))
+   '(one-themes rjsx-mode org-roam posframe company helm magit package-lint lsp-mode treemacs markdown-mode org-noter deft ein polymode anaphora websocket exec-path-from-shell org-re-reveal tern web-mode tagedit slim-mode scss-mode sass-mode pug-mode phpunit phpcbf php-extras php-auto-yasnippets impatient-mode helm-css-scss haml-mode geben emmet-mode drupal-mode dockerfile-mode docker docker-tramp company-web web-completion-data company-phpactor phpactor composer php-runtime company-php ac-php-core xcscope php-mode web-beautify utop tuareg caml tide typescript-mode seeing-is-believing rvm ruby-tools ruby-test-mode ruby-refactor ruby-hash-syntax rubocopfmt rubocop rspec-mode robe rbenv rake prettier-js ocp-indent ob-elixir nodejs-repl mvn minitest meghanada maven-test-mode lsp-java livid-mode skewer-mode simple-httpd json-navigator hierarchy json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc groovy-mode groovy-imports pcache flycheck-ocaml merlin flycheck-credo emojify emoji-cheat-sheet-plus dune company-emoji chruby bundler inf-ruby alchemist elixir-mode org-roam-bibtex yaml-mode yasnippet-snippets yapfify xterm-color ws-butler writeroom-mode winum which-key vterm volatile-highlights vi-tilde-fringe uuidgen use-package treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil toc-org terminal-here symon symbol-overlay string-inflection spaceline-all-the-icons smeargle shell-pop reveal-in-osx-finder restart-emacs rainbow-delimiters pytest pyenv-mode py-isort popwin pippel pipenv pip-requirements pcre2el password-generator paradox overseer osx-trash osx-dictionary osx-clipboard orgit org-superstar org-projectile org-present org-pomodoro org-mime org-journal org-download org-cliplink org-brain open-junk-file nameless multi-term move-text mmm-mode markdown-toc magit-svn magit-section magit-gitflow macrostep lsp-ui lsp-python-ms lorem-ipsum live-py-mode link-hint launchctl indent-guide importmagic hybrid-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-org-rifle helm-org helm-mode-manager helm-make helm-lsp helm-ls-git helm-gitignore helm-git-grep helm-flx helm-descbinds helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitignore-templates gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ gh-md fuzzy font-lock+ flyspell-correct-helm flycheck-pos-tip flycheck-package flycheck-elsa flx-ido fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help emr elisp-slime-nav editorconfig dumb-jump dotenv-mode diminish devdocs dap-mode cython-mode company-reftex company-quickhelp company-box company-auctex company-anaconda column-enforce-mode clean-aindent-mode centered-cursor-mode browse-at-remote blacken auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile aggressive-indent ace-link ace-jump-helm-line ac-ispell)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(org-document-title ((t (:inherit default :weight bold :foreground "#c6c6c6" :font "Source Sans Pro" :height 3.0 :underline nil))))
- '(org-level-1 ((t (:inherit default :weight bold :foreground "#c6c6c6" :font "Source Sans Pro" :height 2.0))))
- '(org-level-2 ((t (:inherit default :weight bold :foreground "#c6c6c6" :font "Source Sans Pro" :height 1.8))))
- '(org-level-3 ((t (:inherit default :weight bold :foreground "#c6c6c6" :font "Source Sans Pro" :height 1.5))))
- '(org-level-4 ((t (:inherit default :weight bold :foreground "#c6c6c6" :font "Source Sans Pro" :height 1.25))))
- '(org-level-5 ((t (:inherit default :weight bold :foreground "#c6c6c6" :font "Source Sans Pro" :height 1.1))))
- '(org-level-6 ((t (:inherit default :weight bold :foreground "#c6c6c6" :font "Source Sans Pro"))))
- '(org-level-7 ((t (:inherit default :weight bold :foreground "#c6c6c6" :font "Source Sans Pro"))))
- '(org-level-8 ((t (:inherit default :weight bold :foreground "#c6c6c6" :font "Source Sans Pro")))))
+ )
 )
